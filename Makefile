@@ -27,11 +27,14 @@ makefiles = \
 OPTIMIZE = 1
 
 ifeq ($(OPTIMIZE), 1)
-  GLOBAL_CXXFLAGS += -O3
+  GLOBAL_CXXFLAGS += -O1
 else
   GLOBAL_CXXFLAGS += -O0 -U_FORTIFY_SOURCE
 endif
 
 include mk/lib.mk
 
-GLOBAL_CXXFLAGS += -g -Wall -include config.h -std=c++17 -I src
+# enable ASan - https://clang.llvm.org/docs/AddressSanitizer.html
+GLOBAL_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls -g -Wall -include config.h -std=c++17 -I src
+
+GLOBAL_LDFLAGS += -fsanitize=address
