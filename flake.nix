@@ -1,5 +1,6 @@
 {
   description = "The purely functional package manager";
+  # make a change to ruin the binary cache
 
   inputs.nixpkgs.url = "nixpkgs/nixos-21.05-small";
   inputs.lowdown-src = { url = "github:kristapsdz/lowdown"; flake = false; };
@@ -266,7 +267,7 @@
         # Forward from the previous stage as we don’t want it to pick the lowdown override
         nixUnstable = prev.nixUnstable;
 
-        nix = with final; with commonDeps pkgs; stdenv.mkDerivation {
+        nix = with final; with commonDeps pkgs; clangStdenv.mkDerivation {
           name = "nix-${version}";
           inherit version;
 
@@ -608,7 +609,7 @@
         with nixpkgsFor.${system};
         with commonDeps pkgs;
 
-        stdenv.mkDerivation {
+        clangStdenv.mkDerivation {
           name = "nix";
 
           outputs = [ "out" "dev" "doc" ];

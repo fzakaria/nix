@@ -79,7 +79,8 @@ define build-library
     else
       ifndef HOST_DARWIN
         ifndef HOST_CYGWIN
-          $(1)_LDFLAGS += -Wl,-z,defs
+          # This is known to cause problems for AddressSanitizer
+          # $(1)_LDFLAGS += -Wl,-z,defs
         endif
       endif
     endif
