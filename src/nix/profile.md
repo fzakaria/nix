@@ -11,7 +11,6 @@ them to be rolled back easily.
 
 )""
 
-#include "profiles.md.gen.hh"
 
 R""(
 

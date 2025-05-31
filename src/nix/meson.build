@@ -114,13 +114,7 @@ if host_machine.system() != 'windows'
 endif
 
 nix_sources += [
-  gen_header.process('doc/manual/generate-manpage.nix'),
-  gen_header.process('doc/manual/generate-settings.nix'),
-  gen_header.process('doc/manual/generate-store-info.nix'),
-  gen_header.process('doc/manual/utils.nix'),
   gen_header.process('get-env.sh'),
-  gen_header.process('profiles.md'),
-  gen_header.process('help-stores.md'),
 ]
 
 # The rest of the subdirectories aren't separate components,

@@ -213,31 +213,11 @@ static void showHelp(std::vector<std::string> subcommand, NixArgs & toplevel)
     evalSettings.pureEval = false;
     EvalState state({}, openStore("dummy://"), fetchSettings, evalSettings);
 
-    auto vGenerateManpage = state.allocValue();
-    state.eval(state.parseExprFromString(
-        #include "generate-manpage.nix.gen.hh"
-        , state.rootPath(CanonPath::root)), *vGenerateManpage);
-
-    state.corepkgsFS->addFile(
-        CanonPath("utils.nix"),
-        #include "utils.nix.gen.hh"
-        );
-
-    state.corepkgsFS->addFile(
-        CanonPath("/generate-settings.nix"),
-        #include "generate-settings.nix.gen.hh"
-        );
-
-    state.corepkgsFS->addFile(
-        CanonPath("/generate-store-info.nix"),
-        #include "generate-store-info.nix.gen.hh"
-        );
 
     auto vDump = state.allocValue();
     vDump->mkString(toplevel.dumpCli());
 
     auto vRes = state.allocValue();
-    state.callFunction(*vGenerateManpage, state.getBuiltin("false"), *vRes, noPos);
     state.callFunction(*vRes, *vDump, *vRes, noPos);
 
     auto attr = vRes->attrs()->get(state.symbols.create(mdName + ".md"));
@@ -301,9 +281,7 @@ struct CmdHelpStores : Command
 
     std::string doc() override
     {
-        return
-          #include "help-stores.md.gen.hh"
-          ;
+        return "No documentation available for this command.";
     }
 
     Category category() override { return catHelp; }
