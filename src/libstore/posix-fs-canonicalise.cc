@@ -53,17 +53,6 @@ static void canonicalisePathMetaData_(
     InodesSeen & inodesSeen)
 {
     checkInterrupt();
-
-#ifdef __APPLE__
-    /* Remove flags, in particular UF_IMMUTABLE which would prevent
-       the file from being garbage-collected. FIXME: Use
-       setattrlist() to remove other attributes as well. */
-    if (lchflags(path.c_str(), 0)) {
-        if (errno != ENOTSUP)
-            throw SysError("clearing flags of path '%1%'", path);
-    }
-#endif
-
     auto st = lstat(path);
 
     /* Really make sure that the path is of a supported type. */

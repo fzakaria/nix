@@ -17,11 +17,7 @@ namespace nix {
 struct ArchiveSettings : Config
 {
     Setting<bool> useCaseHack{this,
-        #ifdef __APPLE__
-            true,
-        #else
             false,
-        #endif
         "use-case-hack",
         "Whether to enable a macOS-specific hack for dealing with file name case collisions."};
 };

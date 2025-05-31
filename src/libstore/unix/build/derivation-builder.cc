@@ -822,12 +822,6 @@ void DerivationBuilderImpl::startBuilder()
         if (chown(slaveName.c_str(), buildUser->getUID(), 0))
             throw SysError("changing owner of pseudoterminal slave");
     }
-#ifdef __APPLE__
-    else {
-        if (grantpt(builderOut.get()))
-            throw SysError("granting access to pseudoterminal slave");
-    }
-#endif
 
     if (unlockpt(builderOut.get()))
         throw SysError("unlocking pseudoterminal");
@@ -2106,7 +2100,6 @@ StorePath DerivationBuilderImpl::makeFallbackPath(const StorePath & path)
 
 // FIXME: do this properly
 #include "linux-derivation-builder.cc"
-#include "darwin-derivation-builder.cc"
 
 namespace nix {
 
@@ -2123,11 +2116,6 @@ std::unique_ptr<DerivationBuilder> makeDerivationBuilder(
             if (params.drvOptions.noChroot)
                 throw Error("derivation '%s' has '__noChroot' set, "
                     "but that's not allowed when 'sandbox' is 'true'", store.printStorePath(params.drvPath));
-#ifdef __APPLE__
-            if (params.drvOptions.additionalSandboxProfile != "")
-                throw Error("derivation '%s' specifies a sandbox profile, "
-                    "but this is only allowed when 'sandbox' is 'relaxed'", store.printStorePath(params.drvPath));
-#endif
             useSandbox = true;
         }
         else if (settings.sandboxMode == smDisabled)
@@ -2164,26 +2152,11 @@ std::unique_ptr<DerivationBuilder> makeDerivationBuilder(
     if (!useSandbox && params.drvOptions.useUidRange(params.drv))
         throw Error("feature 'uid-range' is only supported in sandboxed builds");
 
-    #ifdef __APPLE__
-    return std::make_unique<DarwinDerivationBuilder>(
-        store,
-        std::move(miscMethods),
-        std::move(params),
-        useSandbox);
-    #elif defined(__linux__)
+
     return std::make_unique<LinuxDerivationBuilder>(
         store,
         std::move(miscMethods),
         std::move(params));
-    #else
-    if (useSandbox)
-        throw Error("sandboxing builds is not supported on this platform");
-
-    return std::make_unique<DerivationBuilderImpl>(
-        store,
-        std::move(miscMethods),
-        std::move(params));
-    #endif
 }
 
 }

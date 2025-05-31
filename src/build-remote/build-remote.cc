@@ -5,9 +5,6 @@
 #include <memory>
 #include <tuple>
 #include <iomanip>
-#ifdef __APPLE__
-#include <sys/time.h>
-#endif
 
 #include "nix/store/machines.hh"
 #include "nix/main/shared.hh"
@@ -225,11 +222,7 @@ static int main_build_remote(int argc, char * * argv)
                     break;
                 }
 
-#ifdef __APPLE__
-                futimes(bestSlotLock.get(), NULL);
-#else
                 futimens(bestSlotLock.get(), NULL);
-#endif
 
                 lock = -1;
 

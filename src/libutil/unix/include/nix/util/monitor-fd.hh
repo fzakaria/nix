@@ -55,13 +55,7 @@ public:
                 // https://github.com/apple-oss-distributions/xnu/commit/e13b1fa57645afc8a7b2e7d868fe9845c6b08c40#diff-a5aa0b0e7f4d866ca417f60702689fc797e9cdfe33b601b05ccf43086c35d395R1468
                 // That means added in 2007 or earlier. Should be good enough
                 // for us.
-                short hangup_events =
-#ifdef __APPLE__
-                    POLLHUP
-#else
-                    0
-#endif
-                    ;
+                short hangup_events = 0;
 
                 /* Wait indefinitely until a POLLHUP occurs. */
                 constexpr size_t num_fds = 2;

@@ -702,11 +702,6 @@ public:
     Setting<PathSet> allowedImpureHostPrefixes{this, {}, "allowed-impure-host-deps",
         "Which prefixes to allow derivations to ask for access to (primarily for Darwin)."};
 
-#ifdef __APPLE__
-    Setting<bool> darwinLogSandboxViolations{this, false, "darwin-log-sandbox-violations",
-        "Whether to log Darwin sandbox access violations to the system log."};
-#endif
-
     Setting<bool> runDiffHook{
         this, false, "run-diff-hook",
         R"(

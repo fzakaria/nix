@@ -97,20 +97,6 @@ void LocalStore::optimisePath_(Activity * act, OptimiseStats & stats,
 
     auto st = lstat(path);
 
-#ifdef __APPLE__
-    /* HFS/macOS has some undocumented security feature disabling hardlinking for
-       special files within .app dirs. Known affected paths include
-       *.app/Contents/{PkgInfo,Resources/\*.lproj,_CodeSignature} and .DS_Store.
-       See https://github.com/NixOS/nix/issues/1443 and
-       https://github.com/NixOS/nix/pull/2230 for more discussion. */
-
-    if (std::regex_search(path, std::regex("\\.app/Contents/.+$")))
-    {
-        debug("'%1%' is not allowed to be linked in macOS", path);
-        return;
-    }
-#endif
-
     if (S_ISDIR(st.st_mode)) {
         Strings names = readDirectoryIgnoringInodes(path, inodeHash);
         for (auto & i : names)

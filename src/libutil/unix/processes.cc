@@ -19,14 +19,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#ifdef __APPLE__
-# include <sys/syscall.h>
-#endif
 
-#ifdef __linux__
-# include <sys/prctl.h>
-# include <sys/mman.h>
-#endif
+#include <sys/prctl.h>
+#include <sys/mman.h>
 
 #include "util-config-private.hh"
 #include "util-unix-config-private.hh"
@@ -135,16 +130,8 @@ void killUser(uid_t uid)
             throw SysError("setting uid");
 
         while (true) {
-#ifdef __APPLE__
-            /* OSX's kill syscall takes a third parameter that, among
-               other things, determines if kill(-1, signo) affects the
-               calling process. In the OSX libc, it's set to true,
-               which means "follow POSIX", which we don't want here
-                 */
-            if (syscall(SYS_kill, -1, SIGKILL, false) == 0) break;
-#else
+
             if (kill(-1, SIGKILL) == 0) break;
-#endif
             if (errno == ESRCH || errno == EPERM) break; /* no more processes */
             if (errno != EINTR)
                 throw SysError("cannot kill processes for uid '%1%'", uid);

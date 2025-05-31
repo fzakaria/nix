@@ -75,11 +75,6 @@ Settings::Settings()
     sandboxPaths = tokenizeString<StringSet>("/bin/sh=" SANDBOX_SHELL);
 #endif
 
-    /* chroot-like behavior from Apple's sandbox */
-#ifdef __APPLE__
-    sandboxPaths = tokenizeString<StringSet>("/System/Library/Frameworks /System/Library/PrivateFrameworks /bin/sh /bin/bash /private/tmp /private/var/tmp /usr/lib");
-    allowedImpureHostPrefixes = tokenizeString<StringSet>("/System/Library /usr/lib /dev /bin/sh");
-#endif
 }
 
 void loadConfFile(AbstractConfig & config)
@@ -137,29 +132,6 @@ unsigned int Settings::getDefaultCores()
       return concurrency;
 }
 
-#ifdef __APPLE__
-static bool hasVirt() {
-
-    int hasVMM;
-    int hvSupport;
-    size_t size;
-
-    size = sizeof(hasVMM);
-    if (sysctlbyname("kern.hv_vmm_present", &hasVMM, &size, NULL, 0) == 0) {
-        if (hasVMM)
-            return false;
-    }
-
-    // whether the kernel and hardware supports virt
-    size = sizeof(hvSupport);
-    if (sysctlbyname("kern.hv_support", &hvSupport, &size, NULL, 0) == 0) {
-        return hvSupport == 1;
-    } else {
-        return false;
-    }
-}
-#endif
-
 StringSet Settings::getDefaultSystemFeatures()
 {
     /* For backwards compatibility, accept some "features" that are
@@ -176,11 +148,6 @@ StringSet Settings::getDefaultSystemFeatures()
         features.insert("kvm");
     #endif
 
-    #ifdef __APPLE__
-    if (hasVirt())
-        features.insert("apple-virt");
-    #endif
-
     return features;
 }
 
@@ -191,34 +158,20 @@ StringSet Settings::getDefaultExtraPlatforms()
     if (std::string{NIX_LOCAL_SYSTEM} == "x86_64-linux" && !isWSL1())
         extraPlatforms.insert("i686-linux");
 
-#ifdef __linux__
     StringSet levels = computeLevels();
     for (auto iter = levels.begin(); iter != levels.end(); ++iter)
         extraPlatforms.insert(*iter + "-linux");
-#elif defined(__APPLE__)
-    // Rosetta 2 emulation layer can run x86_64 binaries on aarch64
-    // machines. Note that we can’t force processes from executing
-    // x86_64 in aarch64 environments or vice versa since they can
-    // always exec with their own binary preferences.
-    if (std::string{NIX_LOCAL_SYSTEM} == "aarch64-darwin" &&
-        runProgram(RunOptions {.program = "arch", .args = {"-arch", "x86_64", "/usr/bin/true"}, .mergeStderrToStdout = true}).first == 0)
-        extraPlatforms.insert("x86_64-darwin");
-#endif
 
     return extraPlatforms;
 }
 
 bool Settings::isWSL1()
 {
-#ifdef __linux__
     struct utsname utsbuf;
     uname(&utsbuf);
     // WSL1 uses -Microsoft suffix
     // WSL2 uses -microsoft-standard suffix
     return hasSuffix(utsbuf.release, "-Microsoft");
-#else
-    return false;
-#endif
 }
 
 Path Settings::getDefaultSSLCertFile()
@@ -360,14 +313,7 @@ void initLibStore(bool loadConfig) {
        [1] https://github.com/apple-oss-distributions/objc4/blob/01edf1705fbc3ff78a423cd21e03dfc21eb4d780/runtime/objc-initialize.mm#L614-L636
     */
     curl_global_init(CURL_GLOBAL_ALL);
-#ifdef __APPLE__
-    /* On macOS, don't use the per-session TMPDIR (as set e.g. by
-       sshd). This breaks build users because they don't have access
-       to the TMPDIR, in particular in ‘nix-store --serve’. */
-    if (hasPrefix(defaultTempDir(), "/var/folders/"))
-        unsetenv("TMPDIR");
-#endif
-
+    
     initLibStoreDone = true;
 }
 
