@@ -31,7 +31,6 @@ deps_public_maybe_subproject = [
 subdir('nix-meson-build-support/subprojects')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 configdata = configuration_data()
 

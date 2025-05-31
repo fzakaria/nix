@@ -26,7 +26,6 @@ deps_public_maybe_subproject = [
 subdir('nix-meson-build-support/subprojects')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 sqlite = dependency('sqlite3', 'sqlite', version : '>=3.6.19')
 deps_private += sqlite

@@ -323,19 +323,11 @@ sources = files(
 )
 
 subdir('include/nix/store')
+subdir('linux')
+subdir('unix')
 
-if host_machine.system() == 'linux'
-  subdir('linux')
-endif
-
-if host_machine.system() == 'windows'
-  subdir('windows')
-else
-  subdir('unix')
-endif
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nixstore',

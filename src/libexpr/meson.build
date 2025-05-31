@@ -25,7 +25,6 @@ deps_public_maybe_subproject = [
   dependency('nix-fetchers'),
 ]
 subdir('nix-meson-build-support/subprojects')
-subdir('nix-meson-build-support/big-objs')
 
 # Check for each of these functions, and create a define like `#define HAVE_LCHOWN 1`.
 check_funcs = [
@@ -164,7 +163,6 @@ subdir('include/nix/expr')
 subdir('primops')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nixexpr',

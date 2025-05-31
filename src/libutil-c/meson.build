@@ -46,7 +46,6 @@ headers = files(
 headers += files('nix_api_util_internal.h')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nixutilc',

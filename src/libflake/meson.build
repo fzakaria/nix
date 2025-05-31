@@ -51,7 +51,6 @@ sources = files(
 subdir('include/nix/flake')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nixflake',

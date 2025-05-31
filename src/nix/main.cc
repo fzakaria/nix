@@ -54,7 +54,6 @@ namespace nix {
 /* Check if we have a non-loopback/link-local network interface. */
 static bool haveInternet()
 {
-#ifndef _WIN32
     struct ifaddrs * addrs;
 
     if (getifaddrs(&addrs))
@@ -78,10 +77,6 @@ static bool haveInternet()
     if (haveNetworkProxyConnection()) return true;
 
     return false;
-#else
-    // TODO implement on Windows
-    return true;
-#endif
 }
 
 std::string programPath;

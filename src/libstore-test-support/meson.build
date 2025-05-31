@@ -38,7 +38,6 @@ sources = files(
 subdir('include/nix/store/tests')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nix-store-test-support',

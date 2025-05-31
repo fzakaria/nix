@@ -165,22 +165,10 @@ if not cxx.has_header('widechar_width.h', required : false)
   include_dirs += include_directories('./widecharwidth')
 endif
 
-if host_machine.system() == 'linux'
-  subdir('linux')
-endif
-
-if host_machine.system() == 'freebsd'
-  subdir('freebsd')
-endif
-
-if host_machine.system() == 'windows'
-  subdir('windows')
-else
-  subdir('unix')
-endif
+subdir('linux')
+subdir('unix')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nixutil',

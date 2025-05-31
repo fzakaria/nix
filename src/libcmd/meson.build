@@ -81,7 +81,6 @@ sources = files(
 subdir('include/nix/cmd')
 
 subdir('nix-meson-build-support/export-all-symbols')
-subdir('nix-meson-build-support/windows-version')
 
 this_library = library(
   'nixcmd',
