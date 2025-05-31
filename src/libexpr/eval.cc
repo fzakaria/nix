@@ -317,14 +317,7 @@ EvalState::EvalState(
     , debugStop(false)
     , trylevel(0)
     , regexCache(makeRegexCache())
-#if NIX_USE_BOEHMGC
-    , valueAllocCache(std::allocate_shared<void *>(traceable_allocator<void *>(), nullptr))
-    , env1AllocCache(std::allocate_shared<void *>(traceable_allocator<void *>(), nullptr))
-    , baseEnvP(std::allocate_shared<Env *>(traceable_allocator<Env *>(), &allocEnv(BASE_ENV_SIZE)))
-    , baseEnv(**baseEnvP)
-#else
     , baseEnv(allocEnv(BASE_ENV_SIZE))
-#endif
     , staticBaseEnv{std::make_shared<StaticEnv>(nullptr, nullptr)}
 {
     corepkgsFS->setPathDisplay("<nix", ">");
@@ -2863,17 +2856,7 @@ bool EvalState::eqValues(Value & v1, Value & v2, const PosIdx pos, std::string_v
 }
 
 bool EvalState::fullGC() {
-#if NIX_USE_BOEHMGC
-    GC_gcollect();
-    // Check that it ran. We might replace this with a version that uses more
-    // of the boehm API to get this reliably, at a maintenance cost.
-    // We use a 1K margin because technically this has a race condition, but we
-    // probably won't encounter it in practice, because the CLI isn't concurrent
-    // like that.
-    return GC_get_bytes_since_gc() < 1024;
-#else
     return false;
-#endif
 }
 
 void EvalState::maybePrintStats()
@@ -2882,11 +2865,6 @@ void EvalState::maybePrintStats()
 
     if (showStats) {
         // Make the final heap size more deterministic.
-#if NIX_USE_BOEHMGC
-        if (!fullGC()) {
-            warn("failed to perform a full GC before reporting stats");
-        }
-#endif
         printStatistics();
     }
 }
@@ -2904,16 +2882,6 @@ void EvalState::printStatistics()
     uint64_t bValues = nrValues * sizeof(Value);
     uint64_t bAttrsets = nrAttrsets * sizeof(Bindings) + nrAttrsInAttrsets * sizeof(Attr);
 
-#if NIX_USE_BOEHMGC
-    GC_word heapSize, totalBytes;
-    GC_get_heap_usage_safe(&heapSize, 0, 0, 0, &totalBytes);
-    double gcFullOnlyTime = ({
-        auto ms = GC_get_full_gc_total_time();
-        ms * 0.001;
-    });
-    auto gcCycles = getGCCycles();
-#endif
-
     auto outPath = getEnv("NIX_SHOW_STATS_PATH").value_or("-");
     std::fstream fs;
     if (outPath != "-")
@@ -2925,12 +2893,6 @@ void EvalState::printStatistics()
     topObj["time"] = {
 #ifndef _WIN32 // TODO implement
         {"cpu", cpuTime},
-#endif
-#if NIX_USE_BOEHMGC
-        {GC_is_incremental_mode() ? "gcNonIncremental" : "gc", gcFullOnlyTime},
-#ifndef _WIN32 // TODO implement
-        {GC_is_incremental_mode() ? "gcNonIncrementalFraction" : "gcFraction", gcFullOnlyTime / cpuTime},
-#endif
 #endif
     };
     topObj["envs"] = {
@@ -2970,13 +2932,6 @@ void EvalState::printStatistics()
     topObj["nrLookups"] = nrLookups;
     topObj["nrPrimOpCalls"] = nrPrimOpCalls;
     topObj["nrFunctionCalls"] = nrFunctionCalls;
-#if NIX_USE_BOEHMGC
-    topObj["gc"] = {
-        {"heapSize", heapSize},
-        {"totalBytes", totalBytes},
-        {"cycles", gcCycles},
-    };
-#endif
 
     if (countCalls) {
         topObj["primops"] = primOpCalls;

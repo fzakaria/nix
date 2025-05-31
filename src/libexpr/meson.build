@@ -63,8 +63,6 @@ if bdw_gc.found()
   configdata_pub.set('GC_THREADS', 1)
 endif
 # Used in public header. Affects ABI!
-configdata_pub.set('NIX_USE_BOEHMGC', bdw_gc.found().to_int())
-
 toml11 = dependency(
   'toml11',
   version : '>=3.7.0',

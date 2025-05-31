@@ -6,9 +6,6 @@
 #include "nix/expr/eval-error.hh"
 #include "nix/expr/eval-settings.hh"
 
-// For `NIX_USE_BOEHMGC`, and if that's set, `GC_THREADS`
-#include "nix/expr/config.hh"
-
 namespace nix {
 
 /**
@@ -18,11 +15,7 @@ namespace nix {
 inline void * allocBytes(size_t n)
 {
     void * p;
-#if NIX_USE_BOEHMGC
-    p = GC_MALLOC(n);
-#else
     p = calloc(n, 1);
-#endif
     if (!p) throw std::bad_alloc();
     return p;
 }
@@ -31,25 +24,7 @@ inline void * allocBytes(size_t n)
 [[gnu::always_inline]]
 Value * EvalState::allocValue()
 {
-#if NIX_USE_BOEHMGC
-    /* We use the boehm batch allocator to speed up allocations of Values (of which there are many).
-       GC_malloc_many returns a linked list of objects of the given size, where the first word
-       of each object is also the pointer to the next object in the list. This also means that we
-       have to explicitly clear the first word of every object we take. */
-    if (!*valueAllocCache) {
-        *valueAllocCache = GC_malloc_many(sizeof(Value));
-        if (!*valueAllocCache) throw std::bad_alloc();
-    }
-
-    /* GC_NEXT is a convenience macro for accessing the first word of an object.
-       Take the first list item, advance the list to the next item, and clear the next pointer. */
-    void * p = *valueAllocCache;
-    *valueAllocCache = GC_NEXT(p);
-    GC_NEXT(p) = nullptr;
-#else
     void * p = allocBytes(sizeof(Value));
-#endif
-
     nrValues++;
     return (Value *) p;
 }
@@ -62,22 +37,7 @@ Env & EvalState::allocEnv(size_t size)
     nrValuesInEnvs += size;
 
     Env * env;
-
-#if NIX_USE_BOEHMGC
-    if (size == 1) {
-        /* see allocValue for explanations. */
-        if (!*env1AllocCache) {
-            *env1AllocCache = GC_malloc_many(sizeof(Env) + sizeof(Value *));
-            if (!*env1AllocCache) throw std::bad_alloc();
-        }
-
-        void * p = *env1AllocCache;
-        *env1AllocCache = GC_NEXT(p);
-        GC_NEXT(p) = nullptr;
-        env = (Env *) p;
-    } else
-#endif
-        env = (Env *) allocBytes(sizeof(Env) + size * sizeof(Value *));
+    env = (Env *) allocBytes(sizeof(Env) + size * sizeof(Value *));
 
     /* We assume that env->values has been cleared by the allocator; maybeThunk() and lookupVar fromWith expect this. */
 

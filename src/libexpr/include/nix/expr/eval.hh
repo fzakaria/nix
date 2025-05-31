@@ -17,9 +17,6 @@
 #include "nix/expr/repl-exit-status.hh"
 #include "nix/util/ref.hh"
 
-// For `NIX_USE_BOEHMGC`, and if that's set, `GC_THREADS`
-#include "nix/expr/config.hh"
-
 #include <map>
 #include <optional>
 #include <functional>
@@ -383,18 +380,6 @@ private:
      */
     std::shared_ptr<RegexCache> regexCache;
 
-#if NIX_USE_BOEHMGC
-    /**
-     * Allocation cache for GC'd Value objects.
-     */
-    std::shared_ptr<void *> valueAllocCache;
-
-    /**
-     * Allocation cache for size-1 Env objects.
-     */
-    std::shared_ptr<void *> env1AllocCache;
-#endif
-
 public:
 
     EvalState(
@@ -614,11 +599,6 @@ public:
      * we ensure the string corresponds to it.
      */
     SingleDerivedPath coerceToSingleDerivedPath(const PosIdx pos, Value & v, std::string_view errorCtx);
-
-#if NIX_USE_BOEHMGC
-    /** A GC root for the baseEnv reference. */
-    std::shared_ptr<Env *> baseEnvP;
-#endif
 
 public:
 

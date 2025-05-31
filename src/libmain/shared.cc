@@ -26,7 +26,6 @@
 #include "nix/util/strings.hh"
 
 #include "main-config-private.hh"
-#include "nix/expr/config.hh"
 
 namespace nix {
 
@@ -290,9 +289,6 @@ void printVersion(const std::string & programName)
     std::cout << fmt("%1% (Nix) %2%", programName, nixVersion) << std::endl;
     if (verbosity > lvlInfo) {
         Strings cfg;
-#if NIX_USE_BOEHMGC
-        cfg.push_back("gc");
-#endif
         cfg.push_back("signed-caches");
         std::cout << "System type: " << settings.thisSystem << "\n";
         std::cout << "Additional system types: " << concatStringsSep(", ", settings.extraPlatforms.get()) << "\n";
