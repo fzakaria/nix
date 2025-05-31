@@ -27,11 +27,9 @@
 #if HAVE_STATVFS
 #  include <sys/statvfs.h>
 #endif
-#ifndef _WIN32
-#  include <poll.h>
-#  include <sys/socket.h>
-#  include <sys/un.h>
-#endif
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -179,9 +177,7 @@ void LocalStore::findTempRoots(Roots & tempRoots, bool censor)
 
         debug("reading temporary root file '%1%'", path);
         AutoCloseFD fd(toDescriptor(open(path.c_str(),
-#ifndef _WIN32
             O_CLOEXEC |
-#endif
             O_RDWR, 0666)));
         if (!fd) {
             /* It's okay if the file has disappeared. */

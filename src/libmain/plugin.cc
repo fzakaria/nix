@@ -1,6 +1,4 @@
-#ifndef _WIN32
-#  include <dlfcn.h>
-#endif
+#include <dlfcn.h>
 
 #include <filesystem>
 

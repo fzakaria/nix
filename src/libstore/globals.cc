@@ -15,9 +15,7 @@
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 
-#ifndef _WIN32
 # include <sys/utsname.h>
-#endif
 
 #ifdef __GLIBC__
 # include <gnu/lib-names.h>
@@ -25,15 +23,7 @@
 # include <dlfcn.h>
 #endif
 
-#ifdef __APPLE__
-# include "nix/util/processes.hh"
-#endif
-
 #include "nix/util/config-impl.hh"
-
-#ifdef __APPLE__
-#include <sys/sysctl.h>
-#endif
 
 #include "store-config-private.hh"
 
@@ -54,11 +44,9 @@ static GlobalConfig::Register rSettings(&settings);
 Settings::Settings()
     : nixPrefix(NIX_PREFIX)
     , nixStore(
-#ifndef _WIN32
         // On Windows `/nix/store` is not a canonical path, but we dont'
         // want to deal with that yet.
         canonPath
-#endif
         (getEnvNonEmpty("NIX_STORE_DIR").value_or(getEnvNonEmpty("NIX_STORE").value_or(NIX_STORE_DIR))))
     , nixDataDir(canonPath(getEnvNonEmpty("NIX_DATA_DIR").value_or(NIX_DATA_DIR)))
     , nixLogDir(canonPath(getEnvNonEmpty("NIX_LOG_DIR").value_or(NIX_LOG_DIR)))
@@ -67,9 +55,7 @@ Settings::Settings()
     , nixUserConfFiles(getUserConfigFiles())
     , nixDaemonSocketFile(canonPath(getEnvNonEmpty("NIX_DAEMON_SOCKET_PATH").value_or(nixStateDir + DEFAULT_SOCKET_PATH)))
 {
-#ifndef _WIN32
     buildUsersGroup = isRootUser() ? "nixbld" : "";
-#endif
     allowSymlinkedStore = getEnv("NIX_IGNORE_SYMLINK_STORE") == "1";
 
     auto sslOverride = getEnv("NIX_SSL_CERT_FILE").value_or(getEnv("SSL_CERT_FILE").value_or(""));

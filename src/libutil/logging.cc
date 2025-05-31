@@ -152,11 +152,7 @@ std::atomic<uint64_t> nextId{0};
 
 static uint64_t getPid()
 {
-#ifndef _WIN32
     return getpid();
-#else
-    return GetCurrentProcessId();
-#endif
 }
 
 Activity::Activity(Logger & logger, Verbosity lvl, ActivityType type,

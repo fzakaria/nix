@@ -1,10 +1,9 @@
-#ifndef _WIN32
 
-#  include "nix/util/util.hh"
-#  include "nix/util/monitor-fd.hh"
+#include "nix/util/util.hh"
+#include "nix/util/monitor-fd.hh"
 
-#  include <sys/file.h>
-#  include <gtest/gtest.h>
+#include <sys/file.h>
+#include <gtest/gtest.h>
 
 namespace nix {
 TEST(MonitorFdHup, shouldNotBlock)
@@ -18,5 +17,3 @@ TEST(MonitorFdHup, shouldNotBlock)
     }
 }
 }
-
-#endif

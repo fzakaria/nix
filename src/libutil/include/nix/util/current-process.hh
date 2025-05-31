@@ -3,9 +3,7 @@
 
 #include <optional>
 
-#ifndef _WIN32
-# include <sys/resource.h>
-#endif
+#include <sys/resource.h>
 
 #include "nix/util/types.hh"
 
@@ -18,12 +16,10 @@ namespace nix {
 unsigned int getMaxCPU();
 
 // It does not seem possible to dynamically change stack size on Windows.
-#ifndef _WIN32
 /**
  * Change the stack size.
  */
 void setStackSize(size_t stackSize);
-#endif
 
 /**
  * Restore the original inherited Unix process context (such as signal

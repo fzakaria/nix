@@ -36,19 +36,12 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifndef _WIN32
-# include <grp.h>
-#endif
+#include <grp.h>
 
-#ifdef __linux__
-# include <sched.h>
-# include <sys/statvfs.h>
-# include <sys/mount.h>
-#endif
+#include <sched.h>
+#include <sys/statvfs.h>
+#include <sys/mount.h>
 
-#ifdef __CYGWIN__
-# include <windows.h>
-#endif
 
 #include <sqlite3.h>
 
@@ -146,7 +139,6 @@ LocalStore::LocalStore(ref<const Config> config)
         }
     }
 
-#ifndef _WIN32
     /* Optionally, create directories and set permissions for a
        multi-user install. */
     if (isRootUser() && settings.buildUsersGroup != "") {
@@ -168,7 +160,6 @@ LocalStore::LocalStore(ref<const Config> config)
             }
         }
     }
-#endif
 
     /* Ensure that the store and its parents are not symlinks. */
     if (!settings.allowSymlinkedStore) {
@@ -194,9 +185,7 @@ LocalStore::LocalStore(ref<const Config> config)
             st.st_size != settings.reservedSize)
         {
             AutoCloseFD fd = toDescriptor(open(reservedPath.c_str(), O_WRONLY | O_CREAT
-#ifndef _WIN32
                 | O_CLOEXEC
-#endif
                 , 0600));
             int res = -1;
 #if HAVE_POSIX_FALLOCATE
@@ -380,9 +369,7 @@ AutoCloseFD LocalStore::openGCLock()
 {
     Path fnGCLock = config->stateDir + "/gc.lock";
     auto fdGCLock = open(fnGCLock.c_str(), O_RDWR | O_CREAT
-#ifndef _WIN32
         | O_CLOEXEC
-#endif
         , 0600);
     if (!fdGCLock)
         throw SysError("opening global GC lock '%1%'", fnGCLock);
@@ -938,13 +925,11 @@ void LocalStore::registerValidPath(const ValidPathInfo & info)
 
 void LocalStore::registerValidPaths(const ValidPathInfos & infos)
 {
-#ifndef _WIN32
     /* SQLite will fsync by default, but the new valid paths may not
        be fsync-ed.  So some may want to fsync them before registering
        the validity, at the expense of some speed of the path
        registering operation. */
     if (settings.syncBeforeRegistering) sync();
-#endif
 
     return retrySQLite<void>([&]() {
         auto state(_state.lock());

@@ -197,11 +197,7 @@ Goal::Co PathSubstitutionGoal::tryToRun(StorePath subPath, nix::ref<Store> sub, 
     auto maintainRunningSubstitutions = std::make_unique<MaintainCount<uint64_t>>(worker.runningSubstitutions);
     worker.updateProgress();
 
-#ifndef _WIN32
     outPipe.create();
-#else
-    outPipe.createAsyncPipe(worker.ioport.get());
-#endif
 
     auto promise = std::promise<void>();
 
@@ -225,11 +221,7 @@ Goal::Co PathSubstitutionGoal::tryToRun(StorePath subPath, nix::ref<Store> sub, 
     });
 
     worker.childStarted(shared_from_this(), {
-#ifndef _WIN32
         outPipe.readSide.get()
-#else
-        &outPipe
-#endif
     }, true, false);
 
     co_await Suspend{};

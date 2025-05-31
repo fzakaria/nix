@@ -250,9 +250,7 @@ std::string readFile(const Path & path)
 {
     AutoCloseFD fd = toDescriptor(open(path.c_str(), O_RDONLY
 // TODO
-#ifndef _WIN32
        | O_CLOEXEC
-#endif
        ));
     if (!fd)
         throw SysError("opening file '%1%'", path);
@@ -282,9 +280,7 @@ void readFile(const Path & path, Sink & sink, bool memory_map)
     // Stream the file instead if memory-mapping fails or is disabled.
     AutoCloseFD fd = toDescriptor(open(path.c_str(), O_RDONLY
 // TODO
-#ifndef _WIN32
        | O_CLOEXEC
-#endif
        ));
     if (!fd)
         throw SysError("opening file '%s'", path);
@@ -296,9 +292,7 @@ void writeFile(const Path & path, std::string_view s, mode_t mode, bool sync)
 {
     AutoCloseFD fd = toDescriptor(open(path.c_str(), O_WRONLY | O_TRUNC | O_CREAT
 // TODO
-#ifndef _WIN32
        | O_CLOEXEC
-#endif
        , mode));
     if (!fd)
         throw SysError("opening file '%1%'", path);
@@ -321,9 +315,7 @@ void writeFile(const Path & path, Source & source, mode_t mode, bool sync)
 {
     AutoCloseFD fd = toDescriptor(open(path.c_str(), O_WRONLY | O_TRUNC | O_CREAT
 // TODO
-#ifndef _WIN32
        | O_CLOEXEC
-#endif
        , mode));
     if (!fd)
         throw SysError("opening file '%1%'", path);
@@ -499,9 +491,7 @@ void deletePath(const std::filesystem::path & path)
 void createDir(const Path & path, mode_t mode)
 {
     if (mkdir(path.c_str()
-#ifndef _WIN32
                 , mode
-#endif
                 ) == -1)
         throw SysError("creating directory '%1%'", path);
 }
@@ -590,9 +580,7 @@ std::pair<AutoCloseFD, Path> createTempFile(const Path & prefix)
     AutoCloseFD fd = toDescriptor(mkstemp((char *) tmpl.c_str()));
     if (!fd)
         throw SysError("creating temporary file '%s'", tmpl);
-#ifndef _WIN32
     unix::closeOnExec(fd.get());
-#endif
     return {std::move(fd), tmpl};
 }
 

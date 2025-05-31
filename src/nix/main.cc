@@ -30,22 +30,18 @@
 #include <regex>
 #include <nlohmann/json.hpp>
 
-#ifndef _WIN32
-# include <sys/socket.h>
-# include <ifaddrs.h>
-# include <netdb.h>
-# include <netinet/in.h>
-#endif
+#include <sys/socket.h>
+#include <ifaddrs.h>
+#include <netdb.h>
+#include <netinet/in.h>
 
-#ifdef __linux__
-# include "nix/util/linux-namespaces.hh"
-#endif
+#include "nix/util/linux-namespaces.hh"
 
-#ifndef _WIN32
+
 extern std::string chrootHelperName;
 
 void chrootHelper(int argc, char * * argv);
-#endif
+
 
 #include "nix/util/strings.hh"
 
@@ -302,12 +298,10 @@ void mainWrapped(int argc, char * * argv)
 
     /* The chroot helper needs to be run before any threads have been
        started. */
-#ifndef _WIN32
     if (argc > 0 && argv[0] == chrootHelperName) {
         chrootHelper(argc, argv);
         return;
     }
-#endif
 
     initNix();
     initGC();
@@ -505,11 +499,9 @@ int main(int argc, char * * argv)
 {
     // The CLI has a more detailed version than the libraries; see nixVersion.
     nix::nixVersion = NIX_CLI_VERSION;
-#ifndef _WIN32
     // Increase the default stack size for the evaluator and for
     // libstdc++'s std::regex.
     nix::setStackSize(64 * 1024 * 1024);
-#endif
 
     return nix::handleExceptions(argv[0], [&]() {
         nix::mainWrapped(argc, argv);

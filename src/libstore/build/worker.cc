@@ -436,7 +436,6 @@ void Worker::waitForInput()
 
     MuxablePipePollState state;
 
-#ifndef _WIN32
     /* Use select() to wait for the input side of any logger pipe to
        become `available'.  Note that `available' (i.e., non-blocking)
        includes EOF. */
@@ -446,7 +445,6 @@ void Worker::waitForInput()
             state.fdToPollStatus[j] = state.pollStatus.size() - 1;
         }
     }
-#endif
 
     state.poll(
         useTimeout ? (std::optional { timeout * 1000 }) : std::nullopt);

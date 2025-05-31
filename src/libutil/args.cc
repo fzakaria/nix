@@ -9,9 +9,7 @@
 #include <fstream>
 #include <string>
 #include <regex>
-#ifndef _WIN32
-# include <glob.h>
-#endif
+#include <glob.h>
 
 namespace nix {
 

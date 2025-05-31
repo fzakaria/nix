@@ -790,9 +790,7 @@ void DerivationBuildingGoal::appendLogTailErrorMsg(std::string & msg)
 
 Goal::Co DerivationBuildingGoal::hookDone()
 {
-#ifndef _WIN32
     assert(hook);
-#endif
 
     trace("hook build done");
 
@@ -987,14 +985,7 @@ Path DerivationBuildingGoal::openLogFile()
 
     Path logFileName = fmt("%s/%s%s", dir, baseName.substr(2), settings.compressLog ? ".bz2" : "");
 
-    fdLogFile = toDescriptor(open(
-        logFileName.c_str(),
-        O_CREAT | O_WRONLY | O_TRUNC
-#ifndef _WIN32
-            | O_CLOEXEC
-#endif
-        ,
-        0666));
+    fdLogFile = toDescriptor(open(logFileName.c_str(), O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC, 0666));
     if (!fdLogFile)
         throw SysError("creating log file '%1%'", logFileName);
 

@@ -262,9 +262,7 @@ void LocalStore::optimisePath_(Activity * act, OptimiseStats & stats,
 
     if (act)
         act->result(resFileLinked, st.st_size
-#ifndef _WIN32
             , st.st_blocks
-#endif
             );
 }
 

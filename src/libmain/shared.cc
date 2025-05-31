@@ -111,10 +111,7 @@ std::string getArg(const std::string & opt,
     return *i;
 }
 
-#ifndef _WIN32
 static void sigHandler(int signo) { }
-#endif
-
 
 void initNix(bool loadConfig)
 {
@@ -126,7 +123,6 @@ void initNix(bool loadConfig)
 
     initLibStore(loadConfig);
 
-#ifndef _WIN32
     unix::startSignalHandlerThread();
 
     /* Reset SIGCHLD to its default. */
@@ -141,35 +137,12 @@ void initNix(bool loadConfig)
     /* Install a dummy SIGUSR1 handler for use with pthread_kill(). */
     act.sa_handler = sigHandler;
     if (sigaction(SIGUSR1, &act, 0)) throw SysError("handling SIGUSR1");
-#endif
 
-#ifdef __APPLE__
-    /* HACK: on darwin, we need can’t use sigprocmask with SIGWINCH.
-     * Instead, add a dummy sigaction handler, and signalHandlerThread
-     * can handle the rest. */
-    act.sa_handler = sigHandler;
-    if (sigaction(SIGWINCH, &act, 0)) throw SysError("handling SIGWINCH");
-
-    /* Disable SA_RESTART for interrupts, so that system calls on this thread
-     * error with EINTR like they do on Linux.
-     * Most signals on BSD systems default to SA_RESTART on, but Nix
-     * expects EINTR from syscalls to properly exit. */
-    act.sa_handler = SIG_DFL;
-    if (sigaction(SIGINT, &act, 0)) throw SysError("handling SIGINT");
-    if (sigaction(SIGTERM, &act, 0)) throw SysError("handling SIGTERM");
-    if (sigaction(SIGHUP, &act, 0)) throw SysError("handling SIGHUP");
-    if (sigaction(SIGPIPE, &act, 0)) throw SysError("handling SIGPIPE");
-    if (sigaction(SIGQUIT, &act, 0)) throw SysError("handling SIGQUIT");
-    if (sigaction(SIGTRAP, &act, 0)) throw SysError("handling SIGTRAP");
-#endif
-
-#ifndef _WIN32
     /* Register a SIGSEGV handler to detect stack overflows.
        Why not initLibExpr()? initGC() is essentially that, but
        detectStackOverflow is not an instance of the init function concept, as
        it may have to be invoked more than once per process. */
     detectStackOverflow();
-#endif
 
     /* There is no privacy in the Nix system ;-)  At least not for
        now.  In particular, store objects should be readable by

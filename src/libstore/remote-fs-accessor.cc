@@ -72,9 +72,7 @@ std::pair<ref<SourceAccessor>, CanonPath> RemoteFSAccessor::fetch(const CanonPat
                 [cacheFile](uint64_t offset, uint64_t length) {
 
                     AutoCloseFD fd = toDescriptor(open(cacheFile.c_str(), O_RDONLY
-                    #ifndef _WIN32
                         | O_CLOEXEC
-                    #endif
                         ));
                     if (!fd)
                         throw SysError("opening NAR cache file '%s'", cacheFile);

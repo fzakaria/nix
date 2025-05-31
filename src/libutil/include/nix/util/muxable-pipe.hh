@@ -15,13 +15,7 @@ namespace nix {
  * to be a named pipe because we need I/O Completion Ports to wait on
  * multiple pipes.
  */
-using MuxablePipe =
-#ifndef _WIN32
-    Pipe
-#else
-    windows::AsyncPipe
-#endif
-    ;
+using MuxablePipe = Pipe;
 
 /**
  * Use pool() (Unix) / I/O Completion Ports (Windows) to wait for the
@@ -30,15 +24,8 @@ using MuxablePipe =
  */
 struct MuxablePipePollState
 {
-#ifndef _WIN32
     std::vector<struct pollfd> pollStatus;
     std::map<int, size_t> fdToPollStatus;
-#else
-    OVERLAPPED_ENTRY oentries[0x20] = {0};
-    ULONG removed;
-    bool gotEOF = false;
-
-#endif
 
     /**
      * Check for ready (Unix) / completed (Windows) operations

@@ -43,10 +43,6 @@ OsString string_to_os_string(std::string_view s);
 /**
  * Create string literals with the native character width of paths
  */
-#ifndef _WIN32
-#  define OS_STR(s) s
-#else
-#  define OS_STR(s) L##s
-#endif
+#define OS_STR(s) s
 
 }

@@ -26,43 +26,30 @@ struct Source;
 
 class Pid
 {
-#ifndef _WIN32
     pid_t pid = -1;
     bool separatePG = false;
     int killSignal = SIGKILL;
-#else
-    AutoCloseFD pid = INVALID_DESCRIPTOR;
-#endif
 public:
     Pid();
-#ifndef _WIN32
     Pid(pid_t pid);
     void operator =(pid_t pid);
     operator pid_t();
-#else
-    Pid(AutoCloseFD pid);
-    void operator =(AutoCloseFD pid);
-#endif
     ~Pid();
     int kill();
     int wait();
 
     // TODO: Implement for Windows
-#ifndef _WIN32
     void setSeparatePG(bool separatePG);
     void setKillSignal(int signal);
     pid_t release();
-#endif
 };
 
 
-#ifndef _WIN32
 /**
  * Kill all processes running under the specified uid by sending them
  * a SIGKILL.
  */
 void killUser(uid_t uid);
-#endif
 
 
 /**
@@ -81,9 +68,7 @@ struct ProcessOptions
     int cloneFlags = 0;
 };
 
-#ifndef _WIN32
 pid_t startProcess(std::function<void()> fun, const ProcessOptions & options = ProcessOptions());
-#endif
 
 /**
  * Run a program and return its stdout in a string (i.e., like the
@@ -98,10 +83,8 @@ struct RunOptions
     Path program;
     bool lookupPath = true;
     Strings args;
-#ifndef _WIN32
     std::optional<uid_t> uid;
     std::optional<uid_t> gid;
-#endif
     std::optional<Path> chdir;
     std::optional<StringMap> environment;
     std::optional<std::string> input;

@@ -105,7 +105,6 @@ struct PrintFreed
 };
 
 
-#ifndef _WIN32
 /**
  * Install a SIGSEGV handler to detect stack overflows.
  */
@@ -135,6 +134,5 @@ extern std::function<void(siginfo_t * info, void * ctx)> stackOverflowHandler;
  * logger. Exits the process immediately after.
  */
 void defaultStackOverflowHandler(siginfo_t * info, void * ctx);
-#endif
 
 }

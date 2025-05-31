@@ -27,9 +27,7 @@
 #include <sstream>
 #include <regex>
 
-#ifndef _WIN32
-# include <dlfcn.h>
-#endif
+#include <dlfcn.h>
 
 #include <cmath>
 

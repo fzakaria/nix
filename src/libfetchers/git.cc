@@ -20,9 +20,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#ifndef _WIN32
-#  include <sys/wait.h>
-#endif
+#include <sys/wait.h>
 
 using namespace std::string_literals;
 

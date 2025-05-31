@@ -81,9 +81,7 @@ std::string drainFD(Descriptor fd, bool block = true, const size_t reserveSize=0
 void drainFD(
       Descriptor fd
     , Sink & sink
-#ifndef _WIN32
     , bool block = true
-#endif
     );
 
 /**
@@ -92,11 +90,7 @@ void drainFD(
 [[gnu::always_inline]]
 inline Descriptor getStandardInput()
 {
-#ifndef _WIN32
     return STDIN_FILENO;
-#else
-    return GetStdHandle(STD_INPUT_HANDLE);
-#endif
 }
 
 /**
@@ -105,11 +99,7 @@ inline Descriptor getStandardInput()
 [[gnu::always_inline]]
 inline Descriptor getStandardOutput()
 {
-#ifndef _WIN32
     return STDOUT_FILENO;
-#else
-    return GetStdHandle(STD_OUTPUT_HANDLE);
-#endif
 }
 
 /**
@@ -118,11 +108,7 @@ inline Descriptor getStandardOutput()
 [[gnu::always_inline]]
 inline Descriptor getStandardError()
 {
-#ifndef _WIN32
     return STDERR_FILENO;
-#else
-    return GetStdHandle(STD_ERROR_HANDLE);
-#endif
 }
 
 /**

@@ -406,11 +406,9 @@ public:
     Setting<bool> useSQLiteWAL{this, !isWSL1(), "use-sqlite-wal",
         "Whether SQLite should use WAL mode."};
 
-#ifndef _WIN32
     // FIXME: remove this option, `fsync-store-paths` is faster.
     Setting<bool> syncBeforeRegistering{this, false, "sync-before-registering",
         "Whether to call `sync()` before registering a path as valid."};
-#endif
 
     Setting<bool> useSubstitutes{
         this, true, "substitute",
@@ -651,7 +649,6 @@ public:
     Setting<bool> sandboxFallback{this, true, "sandbox-fallback",
         "Whether to disable sandboxing when the kernel doesn't allow it."};
 
-#ifndef _WIN32
     Setting<bool> requireDropSupplementaryGroups{this, isRootUser(), "require-drop-supplementary-groups",
         R"(
           Following the principle of least privilege,
@@ -669,9 +666,7 @@ public:
           (since `root` usually has permissions to call setgroups)
           and `false` otherwise.
         )"};
-#endif
 
-#ifdef __linux__
     Setting<std::string> sandboxShmSize{
         this, "50%", "sandbox-dev-shm-size",
         R"(
@@ -682,9 +677,7 @@ public:
             description of the `size` option of `tmpfs` in mount(8). The default
             is `50%`.
         )"};
-#endif
 
-#if defined(__linux__) || defined(__FreeBSD__)
     Setting<Path> sandboxBuildDir{this, "/build", "sandbox-build-dir",
         R"(
             *Linux only*
@@ -693,7 +686,6 @@ public:
 
             This directory is backed by [`build-dir`](#conf-build-dir) on the host.
         )"};
-#endif
 
     Setting<std::optional<Path>> buildDir{this, std::nullopt, "build-dir",
         R"(

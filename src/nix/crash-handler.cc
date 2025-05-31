@@ -19,9 +19,7 @@ void logFatal(std::string const & s)
 {
     writeToStderr(s + "\n");
     // std::string for guaranteed null termination
-#ifndef _WIN32
     syslog(LOG_CRIT, "%s", s.c_str());
-#endif
 }
 
 void onTerminate()

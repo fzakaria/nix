@@ -32,16 +32,12 @@ typedef std::set<Inode> InodesSeen;
  */
 void canonicalisePathMetaData(
     const Path & path,
-#ifndef _WIN32
     std::optional<std::pair<uid_t, uid_t>> uidRange,
-#endif
     InodesSeen & inodesSeen);
 
 void canonicalisePathMetaData(
     const Path & path
-#ifndef _WIN32
     , std::optional<std::pair<uid_t, uid_t>> uidRange = std::nullopt
-#endif
     );
 
 void canonicaliseTimestampAndPermissions(const Path & path);

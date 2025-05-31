@@ -49,9 +49,7 @@ void PosixSourceAccessor::readFile(
     auto ap = makeAbsPath(path);
 
     AutoCloseFD fd = toDescriptor(open(ap.string().c_str(), O_RDONLY
-    #ifndef _WIN32
         | O_NOFOLLOW | O_CLOEXEC
-    #endif
         ));
     if (!fd)
         throw SysError("opening file '%1%'", ap.string());
