@@ -75,12 +75,6 @@ int Pid::kill()
        process group, send the signal to every process in the child
        process group (which hopefully includes *all* its children). */
     if (::kill(separatePG ? -pid : pid, killSignal) != 0) {
-        /* On BSDs, killing a process group will return EPERM if all
-           processes in the group are zombies (or something like
-           that). So try to detect and ignore that situation. */
-#if defined(__FreeBSD__) || defined(__APPLE__)
-        if (errno != EPERM || ::kill(pid, 0) != 0)
-#endif
             logError(SysError("killing process %d", pid).info());
     }
 

@@ -55,10 +55,8 @@ struct Child
     steady_time_point timeStarted;
 };
 
-#ifndef _WIN32 // TODO Enable building on Windows
 /* Forward definition. */
 struct HookInstance;
-#endif
 
 /**
  * Coordinates one or more realisations and their interdependencies.
@@ -159,16 +157,10 @@ public:
      */
     bool checkMismatch;
 
-#ifdef _WIN32
-    AutoCloseFD ioport;
-#endif
-
     Store & store;
     Store & evalStore;
 
-#ifndef _WIN32 // TODO Enable building on Windows
     std::unique_ptr<HookInstance> hook;
-#endif
 
     uint64_t expectedBuilds = 0;
     uint64_t doneBuilds = 0;

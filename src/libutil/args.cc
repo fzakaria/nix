@@ -538,13 +538,11 @@ nlohmann::json Args::toJSON()
 static void _completePath(AddCompletions & completions, std::string_view prefix, bool onlyDirs)
 {
     completions.setType(Completions::Type::Filenames);
-    #ifndef _WIN32 // TODO implement globbing completions on Windows
     glob_t globbuf;
     int flags = GLOB_NOESCAPE;
     #ifdef GLOB_ONLYDIR
     if (onlyDirs)
         flags |= GLOB_ONLYDIR;
-    #endif
     // using expandTilde here instead of GLOB_TILDE(_CHECK) so that ~<Tab> expands to /home/user/
     if (glob((expandTilde(prefix) + "*").c_str(), flags, nullptr, &globbuf) == 0) {
         for (size_t i = 0; i < globbuf.gl_pathc; ++i) {

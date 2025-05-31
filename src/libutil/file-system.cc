@@ -23,15 +23,6 @@
 
 #include <boost/iostreams/device/mapped_file.hpp>
 
-#ifdef __FreeBSD__
-# include <sys/param.h>
-# include <sys/mount.h>
-#endif
-
-#ifdef _WIN32
-# include <io.h>
-#endif
-
 namespace nix {
 
 DirectoryIterator::DirectoryIterator(const std::filesystem::path& p) {
@@ -205,11 +196,8 @@ struct stat stat(const Path & path)
     return st;
 }
 
-#ifdef _WIN32
-# define STAT stat
-#else
-# define STAT lstat
-#endif
+
+#define STAT lstat
 
 struct stat lstat(const Path & path)
 {
@@ -369,13 +357,8 @@ void syncParent(const Path & path)
     fd.fsync();
 }
 
-#ifdef __FreeBSD__
-#define MOUNTEDPATHS_PARAM , std::set<Path> &mountedPaths
-#define MOUNTEDPATHS_ARG , mountedPaths
-#else
 #define MOUNTEDPATHS_PARAM
 #define MOUNTEDPATHS_ARG
-#endif
 
 void recursiveSync(const Path & path)
 {
@@ -424,16 +407,7 @@ void recursiveSync(const Path & path)
 
 static void _deletePath(Descriptor parentfd, const std::filesystem::path & path, uint64_t & bytesFreed MOUNTEDPATHS_PARAM)
 {
-#ifndef _WIN32
     checkInterrupt();
-
-#ifdef __FreeBSD__
-    // In case of emergency (unmount fails for some reason) not recurse into mountpoints.
-    // This prevents us from tearing up the nullfs-mounted nix store.
-    if (mountedPaths.find(path) != mountedPaths.end()) {
-        return;
-    }
-#endif
 
     std::string name(baseNameOf(path.native()));
 
@@ -498,10 +472,6 @@ static void _deletePath(Descriptor parentfd, const std::filesystem::path & path,
         if (errno == ENOENT) return;
         throw SysError("cannot unlink %1%", path);
     }
-#else
-    // TODO implement
-    throw UnimplementedError("_deletePath");
-#endif
 }
 
 static void _deletePath(const std::filesystem::path & path, uint64_t & bytesFreed MOUNTEDPATHS_PARAM)
@@ -549,18 +519,6 @@ void createDirs(const std::filesystem::path & path)
 void deletePath(const std::filesystem::path & path, uint64_t & bytesFreed)
 {
     //Activity act(*logger, lvlDebug, "recursively deleting path '%1%'", path);
-#ifdef __FreeBSD__
-    std::set<Path> mountedPaths;
-    struct statfs *mntbuf;
-    int count;
-    if ((count = getmntinfo(&mntbuf, MNT_WAIT)) < 0) {
-        throw SysError("getmntinfo");
-    }
-
-    for (int i = 0; i < count; i++) {
-        mountedPaths.emplace(mntbuf[i].f_mntonname);
-    }
-#endif
     bytesFreed = 0;
     _deletePath(path, bytesFreed MOUNTEDPATHS_ARG);
 }
@@ -604,32 +562,6 @@ void AutoDelete::reset(const std::filesystem::path & p, bool recursive) {
 
 //////////////////////////////////////////////////////////////////////
 
-#ifdef __FreeBSD__
-AutoUnmount::AutoUnmount() : del{false} {}
-
-AutoUnmount::AutoUnmount(Path &p) : path(p), del(true) {}
-
-AutoUnmount::~AutoUnmount()
-{
-    try {
-        if (del) {
-            if (unmount(path.c_str(), 0) < 0) {
-                throw SysError("Failed to unmount path %1%", path);
-            }
-        }
-    } catch (...) {
-        ignoreExceptionInDestructor();
-    }
-}
-
-void AutoUnmount::cancel()
-{
-    del = false;
-}
-#endif
-
-//////////////////////////////////////////////////////////////////////
-
 std::string defaultTempDir() {
     return getEnvNonEmpty("TMPDIR").value_or("/tmp");
 }
@@ -640,22 +572,8 @@ Path createTempDir(const Path & tmpRoot, const Path & prefix, mode_t mode)
         checkInterrupt();
         Path tmpDir = makeTempPath(tmpRoot, prefix);
         if (mkdir(tmpDir.c_str()
-#ifndef _WIN32 // TODO abstract mkdir perms for Windows
                     , mode
-#endif
                     ) == 0) {
-#ifdef __FreeBSD__
-            /* Explicitly set the group of the directory.  This is to
-               work around around problems caused by BSD's group
-               ownership semantics (directories inherit the group of
-               the parent).  For instance, the group of /tmp on
-               FreeBSD is "wheel", so all directories created in /tmp
-               will be owned by "wheel"; but if the user is not in
-               "wheel", then "tar" will fail to unpack archives that
-               have the setgid bit set on directories. */
-            if (chown(tmpDir.c_str(), (uid_t) -1, getegid()) != 0)
-                throw SysError("setting group of directory '%1%'", tmpDir);
-#endif
             return tmpDir;
         }
         if (errno != EEXIST)

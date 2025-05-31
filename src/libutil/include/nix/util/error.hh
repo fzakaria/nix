@@ -256,23 +256,13 @@ public:
     }
 };
 
-#ifdef _WIN32
-namespace windows {
-    class WinError;
-}
-#endif
-
 /**
  * Convenience alias for when we use a `errno`-based error handling
  * function on Unix, and `GetLastError()`-based error handling on on
  * Windows.
  */
 using NativeSysError =
-#ifdef _WIN32
-    windows::WinError
-#else
     SysError
-#endif
     ;
 
 /**

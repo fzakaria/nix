@@ -33,13 +33,11 @@ static void canonicaliseTimestampAndPermissions(const Path & path, const struct 
 
     }
 
-#ifndef _WIN32 // TODO implement
     if (st.st_mtime != mtimeStore) {
         struct stat st2 = st;
         st2.st_mtime = mtimeStore,
         setWriteTime(path, st2);
     }
-#endif
 }
 
 

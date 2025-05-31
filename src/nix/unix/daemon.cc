@@ -34,14 +34,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <fcntl.h>
-
-#ifdef __linux__
 #include "nix/util/cgroup.hh"
-#endif
-
-#if defined(__APPLE__) || defined(__FreeBSD__)
-#include <sys/ucred.h>
-#endif
 
 using namespace nix;
 using namespace nix::daemon;

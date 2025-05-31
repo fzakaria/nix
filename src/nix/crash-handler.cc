@@ -7,16 +7,9 @@
 #include <exception>
 #include <sstream>
 
-// Darwin and FreeBSD stdenv do not define _GNU_SOURCE but do have _Unwind_Backtrace.
-#if defined(__APPLE__) || defined(__FreeBSD__)
-#  define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
-#endif
-
 #include <boost/stacktrace/stacktrace.hpp>
 
-#ifndef _WIN32
-#  include <syslog.h>
-#endif
+#include <syslog.h>
 
 namespace nix {
 

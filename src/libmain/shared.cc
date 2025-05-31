@@ -360,9 +360,6 @@ RunPager::RunPager()
     Pipe toPager;
     toPager.create();
 
-#ifdef _WIN32 // TODO re-enable on Windows, once we can start processes.
-    throw Error("Commit signature verification not implemented on Windows yet");
-#else
     pid = startProcess([&]() {
         if (dup2(toPager.readSide.get(), STDIN_FILENO) == -1)
             throw SysError("dupping stdin");
@@ -381,20 +378,17 @@ RunPager::RunPager()
     std_out = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 0);
     if (dup2(toPager.writeSide.get(), STDOUT_FILENO) == -1)
         throw SysError("dupping standard output");
-#endif
 }
 
 
 RunPager::~RunPager()
 {
     try {
-#ifndef _WIN32 // TODO re-enable on Windows, once we can start processes.
         if (pid != -1) {
             std::cout.flush();
             dup2(std_out, STDOUT_FILENO);
             pid.wait();
         }
-#endif
     } catch (...) {
         ignoreExceptionInDestructor();
     }

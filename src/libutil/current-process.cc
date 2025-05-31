@@ -9,20 +9,10 @@
 #include "nix/util/signals.hh"
 #include <math.h>
 
-#ifdef __APPLE__
-# include <mach-o/dyld.h>
-#endif
 
-#ifdef __linux__
 # include <mutex>
 # include "nix/util/cgroup.hh"
 # include "nix/util/linux-namespaces.hh"
-#endif
-
-#ifdef __FreeBSD__
-# include <sys/param.h>
-# include <sys/sysctl.h>
-#endif
 
 namespace nix {
 
@@ -111,36 +101,7 @@ std::optional<Path> getSelfExe()
 {
     static auto cached = []() -> std::optional<Path>
     {
-        #if defined(__linux__) || defined(__GNU__)
         return readLink("/proc/self/exe");
-        #elif defined(__APPLE__)
-        char buf[1024];
-        uint32_t size = sizeof(buf);
-        if (_NSGetExecutablePath(buf, &size) == 0)
-            return buf;
-        else
-            return std::nullopt;
-        #elif defined(__FreeBSD__)
-        int sysctlName[] = {
-            CTL_KERN,
-            KERN_PROC,
-            KERN_PROC_PATHNAME,
-            -1,
-        };
-        size_t pathLen = 0;
-        if (sysctl(sysctlName, sizeof(sysctlName) / sizeof(sysctlName[0]), nullptr, &pathLen, nullptr, 0) < 0) {
-               return std::nullopt;
-        }
-
-        std::vector<char> path(pathLen);
-        if (sysctl(sysctlName, sizeof(sysctlName) / sizeof(sysctlName[0]), path.data(), &pathLen, nullptr, 0) < 0) {
-            return std::nullopt;
-        }
-
-        return Path(path.begin(), path.end());
-        #else
-        return std::nullopt;
-        #endif
     }();
     return cached;
 }

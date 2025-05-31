@@ -4,9 +4,6 @@
 #include "nix/util/types.hh"
 #include "nix/util/file-descriptor.hh"
 
-#ifdef _WIN32
-#  include <winsock2.h>
-#endif
 #include <unistd.h>
 
 #include <filesystem>
@@ -28,21 +25,7 @@ AutoCloseFD createUnixDomainSocket(const Path & path, mode_t mode);
  * stronger file descriptor vs socket distinction, at least at the level
  * of C types.
  */
-using Socket =
-#ifdef _WIN32
-    SOCKET
-#else
-    int
-#endif
-    ;
-
-#ifdef _WIN32
-/**
- * Windows gives this a different name
- */
-#  define SHUT_WR SD_SEND
-#  define SHUT_RDWR SD_BOTH
-#endif
+using Socket = int;
 
 /**
  * Convert a `Socket` to a `Descriptor`
@@ -51,11 +34,7 @@ using Socket =
  */
 static inline Socket toSocket(Descriptor fd)
 {
-#ifdef _WIN32
-    return reinterpret_cast<Socket>(fd);
-#else
     return fd;
-#endif
 }
 
 /**
@@ -65,11 +44,7 @@ static inline Socket toSocket(Descriptor fd)
  */
 static inline Descriptor fromSocket(Socket fd)
 {
-#ifdef _WIN32
-    return reinterpret_cast<Descriptor>(fd);
-#else
     return fd;
-#endif
 }
 
 /**

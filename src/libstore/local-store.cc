@@ -206,11 +206,7 @@ LocalStore::LocalStore(ref<const Config> config)
                 writeFull(fd.get(), std::string(settings.reservedSize, 'X'));
                 [[gnu::unused]] auto res2 =
 
-#ifdef _WIN32
-                    SetEndOfFile(fd.get())
-#else
                     ftruncate(fd.get(), settings.reservedSize)
-#endif
                     ;
             }
         }

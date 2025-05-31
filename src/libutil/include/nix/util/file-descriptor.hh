@@ -4,10 +4,6 @@
 #include "nix/util/types.hh"
 #include "nix/util/error.hh"
 
-#ifdef _WIN32
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
-#endif
 
 namespace nix {
 
@@ -18,19 +14,11 @@ struct Source;
  * Operating System capability
  */
 using Descriptor =
-#ifdef _WIN32
-    HANDLE
-#else
     int
-#endif
     ;
 
 const Descriptor INVALID_DESCRIPTOR =
-#ifdef _WIN32
-    INVALID_HANDLE_VALUE
-#else
     -1
-#endif
     ;
 
 /**
@@ -40,11 +28,7 @@ const Descriptor INVALID_DESCRIPTOR =
  */
 static inline Descriptor toDescriptor(int fd)
 {
-#ifdef _WIN32
-    return reinterpret_cast<HANDLE>(_get_osfhandle(fd));
-#else
     return fd;
-#endif
 }
 
 /**
@@ -55,11 +39,7 @@ static inline Descriptor toDescriptor(int fd)
  */
 static inline int fromDescriptorReadOnly(Descriptor fd)
 {
-#ifdef _WIN32
-    return _open_osfhandle(reinterpret_cast<intptr_t>(fd), _O_RDONLY);
-#else
     return fd;
-#endif
 }
 
 /**
@@ -185,7 +165,6 @@ public:
     void close();
 };
 
-#ifndef _WIN32 // Not needed on Windows, where we don't fork
 namespace unix {
 
 /**
@@ -200,16 +179,6 @@ void closeExtraFDs();
 void closeOnExec(Descriptor fd);
 
 } // namespace unix
-#endif
-
-#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
-namespace windows {
-
-Path handleToPath(Descriptor handle);
-std::wstring handleToFileName(Descriptor handle);
-
-} // namespace windows
-#endif
 
 MakeError(EndOfFile, Error);
 

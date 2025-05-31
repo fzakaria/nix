@@ -15,11 +15,9 @@
 #include "nix/store/path-with-outputs.hh"
 #include "man-pages.hh"
 
-#ifndef _WIN32 // TODO implement on Windows or provide allowed-to-noop interface
-# include "nix/store/local-store.hh"
-# include "nix/util/monitor-fd.hh"
-# include "nix/store/posix-fs-canonicalise.hh"
-#endif
+#include "nix/store/local-store.hh"
+#include "nix/util/monitor-fd.hh"
+#include "nix/store/posix-fs-canonicalise.hh"
 
 #include <iostream>
 #include <algorithm>
@@ -49,15 +47,12 @@ static bool noOutput = false;
 static std::shared_ptr<Store> store;
 
 
-#ifndef _WIN32 // TODO reenable on Windows once we have `LocalStore` there
 ref<LocalStore> ensureLocalStore()
 {
     auto store2 = std::dynamic_pointer_cast<LocalStore>(store);
     if (!store2) throw Error("you don't have sufficient rights to use this command");
     return ref<LocalStore>(store2);
 }
-#endif
-
 
 static StorePath useDeriver(const StorePath & path)
 {
@@ -557,11 +552,7 @@ static void registerValidity(bool reregister, bool hashGiven, bool canonicalise)
         if (!store->isValidPath(info->path) || reregister) {
             /* !!! races */
             if (canonicalise)
-#ifdef _WIN32 // TODO implement on Windows
-                throw UnimplementedError("file attribute canonicalisation Is not implemented on Windows");
-#else
                 canonicalisePathMetaData(store->printStorePath(info->path), {});
-#endif
             if (!hashGiven) {
                 HashResult hash = hashPath(
                     {store->getFSAccessor(false), CanonPath { info->path.to_string() }},
@@ -573,9 +564,7 @@ static void registerValidity(bool reregister, bool hashGiven, bool canonicalise)
         }
     }
 
-#ifndef _WIN32 // TODO reenable on Windows once we have `LocalStore` there
     ensureLocalStore()->registerValidPaths(infos);
-#endif
 }
 
 
@@ -958,9 +947,7 @@ static void opServe(Strings opFlags, Strings opArgs)
                 getBuildSettings();
 
                 try {
-#ifndef _WIN32 // TODO figure out if Windows needs something similar
                     MonitorFdHup monitor(in.fd);
-#endif
                     store->buildPaths(toDerivedPaths(paths));
                     out << 0;
                 } catch (Error & e) {
@@ -980,9 +967,7 @@ static void opServe(Strings opFlags, Strings opArgs)
 
                 getBuildSettings();
 
-#ifndef _WIN32 // TODO figure out if Windows needs something similar
                 MonitorFdHup monitor(in.fd);
-#endif
                 auto status = store->buildDerivation(drvPath, drv);
 
                 ServeProto::write(*store, wconn, status);

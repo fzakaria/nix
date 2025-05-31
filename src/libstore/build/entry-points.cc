@@ -1,8 +1,6 @@
 #include "nix/store/build/worker.hh"
 #include "nix/store/build/substitution-goal.hh"
-#ifndef _WIN32 // TODO Enable building on Windows
-#  include "nix/store/build/derivation-goal.hh"
-#endif
+#include "nix/store/build/derivation-goal.hh"
 #include "nix/store/local-store.hh"
 #include "nix/util/strings.hh"
 
@@ -28,11 +26,9 @@ void Store::buildPaths(const std::vector<DerivedPath> & reqs, BuildMode buildMod
                 ex = std::move(i->ex);
         }
         if (i->exitCode != Goal::ecSuccess) {
-#ifndef _WIN32 // TODO Enable building on Windows
             if (auto i2 = dynamic_cast<DerivationGoal *>(i.get()))
                 failed.insert(i2->drvReq->to_string(*this));
             else
-#endif
             if (auto i2 = dynamic_cast<PathSubstitutionGoal *>(i.get()))
                 failed.insert(printStorePath(i2->storePath));
         }
@@ -81,12 +77,7 @@ BuildResult Store::buildDerivation(const StorePath & drvPath, const BasicDerivat
     BuildMode buildMode)
 {
     Worker worker(*this, *this);
-#ifndef _WIN32 // TODO Enable building on Windows
     auto goal = worker.makeBasicDerivationGoal(drvPath, drv, OutputsSpec::All {}, buildMode);
-#else
-    std::shared_ptr<Goal> goal;
-    throw UnimplementedError("Building derivations not yet implemented on windows.");
-#endif
 
     try {
         worker.run(Goals{goal});

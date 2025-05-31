@@ -7,14 +7,7 @@
 #include <memory>
 
 #include <boost/coroutine2/coroutine.hpp>
-
-#ifdef _WIN32
-# include <fileapi.h>
-# include <winsock2.h>
-# include "nix/util/windows-error.hh"
-#else
 # include <poll.h>
-#endif
 
 
 namespace nix {
@@ -134,14 +127,6 @@ bool BufferedSource::hasData()
 
 size_t FdSource::readUnbuffered(char * data, size_t len)
 {
-#ifdef _WIN32
-    DWORD n;
-    checkInterrupt();
-    if (!::ReadFile(fd, data, len, &n, NULL)) {
-        _good = false;
-        throw windows::WinError("ReadFile when FdSource::readUnbuffered");
-    }
-#else
     ssize_t n;
     do {
         checkInterrupt();
@@ -149,7 +134,6 @@ size_t FdSource::readUnbuffered(char * data, size_t len)
     } while (n == -1 && errno == EINTR);
     if (n == -1) { _good = false; throw SysError("reading from file"); }
     if (n == 0) { _good = false; throw EndOfFile(std::string(*endOfFileError)); }
-#endif
     read += n;
     return n;
 }

@@ -2,14 +2,8 @@
 #include "nix/util/environment-variables.hh"
 #include "nix/util/sync.hh"
 
-#ifdef _WIN32
-# include <io.h>
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
-# define isatty _isatty
-#else
-# include <sys/ioctl.h>
-#endif
+
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <widechar_width.h>
 

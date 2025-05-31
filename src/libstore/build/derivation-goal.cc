@@ -1,9 +1,7 @@
 #include "nix/store/build/derivation-goal.hh"
 #include "nix/store/build/derivation-building-goal.hh"
-#ifndef _WIN32 // TODO enable build hook on Windows
-#  include "nix/store/build/hook-instance.hh"
-#  include "nix/store/build/derivation-builder.hh"
-#endif
+#include "nix/store/build/hook-instance.hh"
+#include "nix/store/build/derivation-builder.hh"
 #include "nix/util/processes.hh"
 #include "nix/util/config-global.hh"
 #include "nix/store/build/worker.hh"

@@ -92,7 +92,6 @@ void initPlugins()
             checkInterrupt();
             /* handle is purposefully leaked as there may be state in the
                DSO needed by the action of the plugin. */
-#ifndef _WIN32 // TODO implement via DLL loading on Windows
             void * handle = dlopen(file.c_str(), RTLD_LAZY | RTLD_LOCAL);
             if (!handle)
                 throw Error("could not dynamically open plugin file '%s': %s", file, dlerror());
@@ -102,9 +101,6 @@ void initPlugins()
             void (*nix_plugin_entry)() = (void (*)()) dlsym(handle, "nix_plugin_entry");
             if (nix_plugin_entry)
                 nix_plugin_entry();
-#else
-            throw Error("could not dynamically open plugin file '%s'", file);
-#endif
         }
     }
 

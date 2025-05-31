@@ -11,24 +11,14 @@
 
 #include <numeric>
 
-#ifdef _WIN32
-#  define FS_SEP L"\\"
-#  define FS_ROOT L"C:" FS_SEP // Need a mounted one, C drive is likely
-#else
-#  define FS_SEP "/"
-#  define FS_ROOT FS_SEP
-#endif
+#define FS_SEP "/"
+#define FS_ROOT FS_SEP
 
 #ifndef PATH_MAX
 #  define PATH_MAX 4096
 #endif
 
-#ifdef _WIN32
-#  define GET_CWD _wgetcwd
-#else
-#  define GET_CWD getcwd
-#endif
-
+#define GET_CWD getcwd
 namespace nix {
 
 /* ----------- tests for file-system.hh -------------------------------------*/

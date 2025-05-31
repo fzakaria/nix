@@ -2,14 +2,10 @@
 #include "nix/util/unix-domain-socket.hh"
 #include "nix/util/util.hh"
 
-#ifdef _WIN32
-# include <winsock2.h>
-# include <afunix.h>
-#else
-# include <sys/socket.h>
-# include <sys/un.h>
-# include "nix/util/processes.hh"
-#endif
+
+#include <sys/socket.h>
+#include <sys/un.h>
+#include "nix/util/processes.hh"
 #include <unistd.h>
 
 namespace nix {
@@ -59,9 +55,6 @@ static void bindConnectProcHelper(
     auto * psaddr = reinterpret_cast<struct sockaddr *>(&addr);
 
     if (path.size() + 1 >= sizeof(addr.sun_path)) {
-#ifdef _WIN32
-        throw Error("cannot %s to socket at '%s': path is too long", operationName, path);
-#else
         Pipe pipe;
         pipe.create();
         Pid pid = startProcess([&] {
@@ -91,7 +84,6 @@ static void bindConnectProcHelper(
             errno = *errNo;
             throw SysError("cannot %s to socket at '%s'", operationName, path);
         }
-#endif
     } else {
         memcpy(addr.sun_path, path.c_str(), path.size() + 1);
         if (operation(fd, psaddr, sizeof(addr)) == -1)

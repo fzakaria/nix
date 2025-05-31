@@ -83,11 +83,7 @@ StorePath MixStoreDirMethods::parseStorePath(std::string_view path) const
     // support remote stores whose store dir is a non-native path (e.g.
     // Windows <-> Unix ssh-ing).
     auto p =
-#ifdef _WIN32
-        path
-#else
         canonPath(std::string(path))
-#endif
         ;
     if (dirOf(p) != storeDir)
         throw BadStorePath("path '%s' is not in the Nix store", p);

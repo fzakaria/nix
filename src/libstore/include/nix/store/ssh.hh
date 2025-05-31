@@ -24,9 +24,7 @@ private:
 
     struct State
     {
-#ifndef _WIN32 // TODO re-enable on Windows, once we can start processes.
         Pid sshMaster;
-#endif
         std::unique_ptr<AutoDelete> tmpDir;
         Path socketPath;
     };
@@ -36,9 +34,7 @@ private:
     void addCommonSSHOpts(Strings & args);
     bool isMasterRunning();
 
-#ifndef _WIN32 // TODO re-enable on Windows, once we can start processes.
     Path startMaster();
-#endif
 
 public:
 
@@ -50,9 +46,7 @@ public:
 
     struct Connection
     {
-#ifndef _WIN32 // TODO re-enable on Windows, once we can start processes.
         Pid sshPid;
-#endif
         AutoCloseFD out, in;
 
         /**

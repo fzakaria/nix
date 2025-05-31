@@ -5,9 +5,7 @@
 #include "nix/store/build/drv-output-substitution-goal.hh"
 #include "nix/store/build/derivation-goal.hh"
 #include "nix/store/build/derivation-building-goal.hh"
-#ifndef _WIN32 // TODO Enable building on Windows
-#  include "nix/store/build/hook-instance.hh"
-#endif
+#include "nix/store/build/hook-instance.hh"
 #include "nix/util/signals.hh"
 
 namespace nix {
@@ -451,9 +449,6 @@ void Worker::waitForInput()
 #endif
 
     state.poll(
-#ifdef _WIN32
-        ioport.get(),
-#endif
         useTimeout ? (std::optional { timeout * 1000 }) : std::nullopt);
 
     auto after = steady_time_point::clock::now();

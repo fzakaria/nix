@@ -377,7 +377,6 @@ static RegisterPrimOp primop_import({
     }
 });
 
-#ifndef _WIN32 // TODO implement via DLL loading on Windows
 
 /* Want reasonable symbol names, so extern C */
 /* !!! Should we pass the Pos or the file name too? */
@@ -450,8 +449,6 @@ void prim_exec(EvalState & state, const PosIdx pos, Value * * args, Value & v)
         throw;
     }
 }
-
-#endif
 
 /* Return a string representing the type of the expression. */
 static void prim_typeOf(EvalState & state, const PosIdx pos, Value * * args, Value & v)
@@ -4904,7 +4901,6 @@ void EvalState::createBaseEnv(const EvalSettings & evalSettings)
         )",
     });
 
-#ifndef _WIN32 // TODO implement on Windows
     // Miscellaneous
     if (settings.enableNativeCode) {
         addPrimOp({
@@ -4918,7 +4914,6 @@ void EvalState::createBaseEnv(const EvalSettings & evalSettings)
             .fun = prim_exec,
         });
     }
-#endif
 
     addPrimOp({
         .name = "__traceVerbose",

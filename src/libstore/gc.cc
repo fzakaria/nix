@@ -504,9 +504,6 @@ void LocalStore::collectGarbage(const GCOptions & options, GCResults & results)
     auto fdServer = createUnixDomainSocket(socketPath, 0666);
 
     // TODO nonblocking socket on windows?
-#ifdef _WIN32
-    throw UnimplementedError("External GC client not implemented yet");
-#else
     if (fcntl(fdServer.get(), F_SETFL, fcntl(fdServer.get(), F_GETFL) | O_NONBLOCK) == -1)
         throw SysError("making socket '%1%' non-blocking", socketPath);
 
@@ -607,7 +604,6 @@ void LocalStore::collectGarbage(const GCOptions & options, GCResults & results)
         if (serverThread.joinable()) serverThread.join();
     });
 
-#endif
 
     /* Find the roots.  Since we've grabbed the GC lock, the set of
        permanent roots cannot increase now. */
@@ -882,11 +878,7 @@ void LocalStore::collectGarbage(const GCOptions & options, GCResults & results)
         if (stat(linksDir.c_str(), &st) == -1)
             throw SysError("statting '%1%'", linksDir);
         int64_t overhead =
-#ifdef _WIN32
-            0
-#else
             st.st_blocks * 512ULL
-#endif
             ;
 
         printInfo("note: currently hard linking saves %.2f MiB",

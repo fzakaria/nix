@@ -2,16 +2,8 @@
 ///@file
 
 #include "nix/util/file-descriptor.hh"
-#ifdef _WIN32
-#  include "nix/util/windows-async-pipe.hh"
-#endif
 
-#ifndef _WIN32
-#  include <poll.h>
-#else
-#  include <ioapiset.h>
-#  include "nix/util/windows-error.hh"
-#endif
+#include <poll.h>
 
 namespace nix {
 
@@ -51,19 +43,9 @@ struct MuxablePipePollState
     /**
      * Check for ready (Unix) / completed (Windows) operations
      */
-    void poll(
-#ifdef _WIN32
-        HANDLE ioport,
-#endif
-        std::optional<unsigned int> timeout);
+    void poll(std::optional<unsigned int> timeout);
 
-    using CommChannel =
-#ifndef _WIN32
-        Descriptor
-#else
-        windows::AsyncPipe *
-#endif
-        ;
+    using CommChannel = Descriptor;
 
     /**
      * Process for ready (Unix) / completed (Windows) operations,

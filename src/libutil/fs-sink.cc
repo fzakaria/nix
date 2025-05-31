@@ -4,11 +4,6 @@
 #include "nix/util/config-global.hh"
 #include "nix/util/fs-sink.hh"
 
-#ifdef _WIN32
-# include <fileapi.h>
-# include "nix/util/file-path.hh"
-# include "nix/util/windows-error.hh"
-#endif
 
 #include "util-config-private.hh"
 
@@ -113,11 +108,7 @@ void RestoreSink::createRegularFile(const CanonPath & path, std::function<void(C
     RestoreRegularFile crf;
     crf.startFsync = startFsync;
     crf.fd =
-#ifdef _WIN32
-        CreateFileW(p.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL)
-#else
         open(p.c_str(), O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC, 0666)
-#endif
         ;
     if (!crf.fd) throw NativeSysError("creating file '%1%'", p);
     func(crf);
