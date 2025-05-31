@@ -6,6 +6,5 @@ headers = files(
   'characterization.hh',
   'gtest-with-params.hh',
   'hash.hh',
-  'nix_api_util.hh',
   'string_callback.hh',
 )

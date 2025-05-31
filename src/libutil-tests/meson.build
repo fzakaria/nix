@@ -16,7 +16,6 @@ subdir('nix-meson-build-support/deps-lists')
 
 deps_private_maybe_subproject = [
   dependency('nix-util'),
-  dependency('nix-util-c'),
   dependency('nix-util-test-support'),
 ]
 deps_public_maybe_subproject = [
@@ -59,7 +58,6 @@ sources = files(
   'logging.cc',
   'lru-cache.cc',
   'monitorfdhup.cc',
-  'nix_api_util.cc',
   'pool.cc',
   'position.cc',
   'processes.cc',

@@ -17,7 +17,6 @@ subdir('nix-meson-build-support/deps-lists')
 deps_private_maybe_subproject = [
   dependency('nix-expr-test-support'),
   dependency('nix-flake'),
-  dependency('nix-flake-c'),
 ]
 deps_public_maybe_subproject = [
 ]
@@ -35,7 +34,6 @@ subdir('nix-meson-build-support/common')
 
 sources = files(
   'flakeref.cc',
-  'nix_api_flake.cc',
   'url-name.cc',
 )
 

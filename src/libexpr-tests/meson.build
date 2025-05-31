@@ -16,7 +16,6 @@ subdir('nix-meson-build-support/deps-lists')
 
 deps_private_maybe_subproject = [
   dependency('nix-expr'),
-  dependency('nix-expr-c'),
   dependency('nix-expr-test-support'),
 ]
 deps_public_maybe_subproject = [
@@ -50,9 +49,6 @@ sources = files(
   'eval.cc',
   'json.cc',
   'main.cc',
-  'nix_api_expr.cc',
-  'nix_api_external.cc',
-  'nix_api_value.cc',
   'primops.cc',
   'search-path.cc',
   'trivial.cc',

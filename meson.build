@@ -31,13 +31,6 @@ if get_option('doc-gen')
   endif
 endif
 
-# External C wrapper libraries
-subproject('libutil-c')
-subproject('libstore-c')
-subproject('libfetchers-c')
-subproject('libexpr-c')
-subproject('libflake-c')
-subproject('libmain-c')
 
 # Language Bindings
 if get_option('bindings') and not meson.is_cross_build()

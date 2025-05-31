@@ -18,7 +18,6 @@ deps_private_maybe_subproject = [
 ]
 deps_public_maybe_subproject = [
   dependency('nix-util'),
-  dependency('nix-util-c'),
 ]
 subdir('nix-meson-build-support/subprojects')
 

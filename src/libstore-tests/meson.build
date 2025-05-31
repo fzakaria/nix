@@ -18,7 +18,6 @@ nix_store = dependency('nix-store')
 
 deps_private_maybe_subproject = [
   nix_store,
-  dependency('nix-store-c'),
   dependency('nix-store-test-support'),
 ]
 deps_public_maybe_subproject = [
@@ -66,7 +65,6 @@ sources = files(
   'machines.cc',
   'nar-info-disk-cache.cc',
   'nar-info.cc',
-  'nix_api_store.cc',
   'outputs-spec.cc',
   'path-info.cc',
   'path.cc',
