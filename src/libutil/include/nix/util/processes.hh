@@ -4,8 +4,6 @@
 #include "nix/util/types.hh"
 #include "nix/util/error.hh"
 #include "nix/util/file-descriptor.hh"
-#include "nix/util/logging.hh"
-#include "nix/util/ansicolor.hh"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -13,10 +11,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include <atomic>
 #include <functional>
-#include <map>
-#include <sstream>
 #include <optional>
 
 namespace nix {
