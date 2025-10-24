@@ -122,7 +122,7 @@
     - [Derivation](protocols/json/derivation.md)
   - [Serving Tarball Flakes](protocols/tarball-fetcher.md)
   - [Store Path Specification](protocols/store-path.md)
-  - [Nix Archive (NAR) Format](protocols/nix-archive.md)
+  - [Nix Archive (NAR) Format](protocols/nix-archive/index.md)
   - [Derivation "ATerm" file format](protocols/derivation-aterm.md)
 - [C API](c-api.md)
 - [Glossary](glossary.md)
