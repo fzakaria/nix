@@ -52,9 +52,7 @@ mkMesonDerivation (finalAttrs: {
     (callPackage ./kaitai-struct-cpp-stl-runtime.nix { })
   ];
 
-  buildInputs = [
-  ]
-  ++ finalAttrs.passthru.externalBuildInputs;
+  buildInputs = finalAttrs.passthru.externalBuildInputs;
 
   nativeBuildInputs = [
     meson

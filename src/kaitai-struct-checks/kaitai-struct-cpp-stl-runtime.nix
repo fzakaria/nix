@@ -13,6 +13,7 @@
 # Force gccStdenv otherwise it might try to use ccachStdenv
 # from .envrc and fail to build
 # This can go away when the nixpkgs pull request is merged.
+# https://github.com/NixOS/nixpkgs/pull/454243
 gccStdenv.mkDerivation (finalAttrs: {
   pname = "kaitai-struct-cpp-stl-runtime";
   version = "0.11";
@@ -21,7 +22,7 @@ gccStdenv.mkDerivation (finalAttrs: {
     owner = "kaitai-io";
     repo = "kaitai_struct_cpp_stl_runtime";
     tag = finalAttrs.version;
-    sha256 = "sha256-2glGPf08bkzvnkLpQIaG2qiy/yO+bZ14hjIaCKou2vU=";
+    hash = "sha256-2glGPf08bkzvnkLpQIaG2qiy/yO+bZ14hjIaCKou2vU=";
   };
 
   doCheck = true;
